@@ -9,14 +9,36 @@ library(dplyr)
 # import data
 data <- read_xlsx("Master.xlsx")
 
-# make data balanced (baseline)
-data_b <- make.pbalanced(data, balance.type = "shared.individuals")
+# rename column names
+names(data)[1] <- "ID"
+names(data)[2] <- "year"
+names(data)[3] <- "hours"
+names(data)[4] <- "employees"
+names(data)[5] <- "sales"
 
-# number of clients in data set
+# delete duplicates
+data <- data[!duplicated(data[c("year", "ID")]),]
+
+# number of clients
 count <- data %>%
-  summarise(n_distinct(CISCaseID))
+  summarise(n_distinct(ID))
 count <- as.integer(count)
 count
+
+# define Hours Squared 
+hoursSq <- (data$hours)^2
+
+# run panel regression 
+panel <- plm(sales ~ hours+employees+hoursSq, data=data, index=c("ID", "year"), model="within")
+summary(panel)
+
+
+
+
+
+
+
+
 
 
 
