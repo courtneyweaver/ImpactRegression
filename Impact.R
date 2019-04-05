@@ -5,6 +5,10 @@ setwd("~/ImpactRegression")
 library(readxl)
 library(plm)
 library(dplyr)
+library(broom)
+library(kableExtra)
+library(lmtest)
+library(sandwich)
 
 # import data
 data <- read_xlsx("Master.xlsx")
@@ -28,10 +32,19 @@ count
 # define Hours Squared 
 hoursSq <- (data$hours)^2
 
+# define log of sales
+data$lnSales <- log(data$sales)
+
 # run panel regression 
-panel <- plm(sales ~ hours+employees+hoursSq, data=data, index=c("ID", "year"), model="within")
+panel <- plm(lnSales ~ hours+employees+hoursSq, data=data, index=c("ID", "year"), model="within")
 summary(panel)
 
+tbl <- tidy(panel)
+kable(tbl, digits=5, caption=
+        "Fixed effects using 'within' with full sample")
+
+# print summary using robust standard errors
+coeftest(panel, vcov. = vcovHC, type = "HC1")
 
 
 
