@@ -23,6 +23,10 @@ names(data)[5] <- "sales"
 # delete duplicates
 data <- data[!duplicated(data[c("year", "ID")]),]
 
+# delete zero or NA sales
+data <-data[!(data$sales==0),]
+data <- data[!is.na(data$sales),]
+
 # number of clients
 count <- data %>%
   summarise(n_distinct(ID))
@@ -36,23 +40,22 @@ hoursSq <- (data$hours)^2
 data$lnSales <- log(data$sales)
 
 # run panel regression 
-panel <- plm(lnSales ~ hours+employees+hoursSq, data=data, index=c("ID", "year"), model="within")
+panel <- plm(lnSales ~ hours + employees + hoursSq, data=data, index=c("ID", "year"), model="within")
 summary(panel)
 
 tbl <- tidy(panel)
 kable(tbl, digits=5, caption=
-        "Fixed effects using 'within' with full sample")
+        "Fixed effects using 'within'")%>%
+  kable_styling(bootstrap_options = "striped", full_width = F)
+
 
 # print summary using robust standard errors
-coeftest(panel, vcov. = vcovHC, type = "HC1")
-
-
-
-
-
-
-
-
+a <- coeftest(panel, vcov. = vcovHC, type = "HC1")
+a
+b <- tidy(a)
+kable(b, digits=5, caption=
+        "Fixed effects using 'within' with Robust Standard Errors")%>%
+  kable_styling(bootstrap_options = "striped", full_width = F)
 
 
 
