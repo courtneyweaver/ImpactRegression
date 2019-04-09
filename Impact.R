@@ -43,6 +43,7 @@ data$lnSales <- log(data$sales)
 panel <- plm(lnSales ~ hours + employees + hoursSq, data=data, index=c("ID", "year"), model="within")
 summary(panel)
 
+# print summary 
 tbl <- tidy(panel)
 kable(tbl, digits=5, caption=
         "Fixed effects using 'within'")%>%
@@ -51,7 +52,6 @@ kable(tbl, digits=5, caption=
 
 # print summary using robust standard errors
 a <- coeftest(panel, vcov. = vcovHC, type = "HC1")
-a
 b <- tidy(a)
 kable(b, digits=5, caption=
         "Fixed effects using 'within' with Robust Standard Errors")%>%
