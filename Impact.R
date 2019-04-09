@@ -9,6 +9,8 @@ library(broom)
 library(kableExtra)
 library(lmtest)
 library(sandwich)
+library(pastecs)
+library(tibble)
 
 # import data
 data <- read_xlsx("Master.xlsx")
@@ -25,6 +27,7 @@ data <- data[!duplicated(data[c("year", "ID")]),]
 
 # delete zero or NA sales
 data <-data[!(data$sales==0),]
+data <-data[!(data$sales<=5),]
 data <- data[!is.na(data$sales),]
 
 # number of clients
@@ -46,7 +49,7 @@ summary(panel)
 # print summary 
 tbl <- tidy(panel)
 kable(tbl, digits=5, caption=
-        "Fixed effects using 'within'")%>%
+        "Estimation of Sales using Fixed Effects")%>%
   kable_styling(bootstrap_options = "striped", full_width = F)
 
 
@@ -54,8 +57,11 @@ kable(tbl, digits=5, caption=
 a <- coeftest(panel, vcov. = vcovHC, type = "HC1")
 b <- tidy(a)
 kable(b, digits=5, caption=
-        "Fixed effects using 'within' with Robust Standard Errors")%>%
+        "Estimation of Sales using Fixed Effects with Robust Standard Errors")%>%
   kable_styling(bootstrap_options = "striped", full_width = F)
 
-
-
+# summary statistics on control variables
+options(scipen=100)
+options(digits=1)
+c <- stat.desc(data)
+c
