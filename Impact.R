@@ -5,6 +5,7 @@ setwd("~/ImpactRegression")
 library(readxl)
 library(plm)
 library(dplyr)
+library(stringr)
 library(broom)
 library(kableExtra)
 library(lmtest)
@@ -24,6 +25,10 @@ names(data)[5] <- "sales"
 
 # delete duplicates
 data <- data[!duplicated(data[c("year", "ID")]),]
+
+# delete all data with incomplete values
+data <- data[!is.na(data$hours),!is.na(data$employees),]
+data <- data[!is.na(data$employees),]
 
 # delete zero or NA sales
 data <-data[!(data$sales==0),]
@@ -65,3 +70,32 @@ options(scipen=100)
 options(digits=1)
 c <- stat.desc(data)
 c
+d <-t(c)
+d <- as.data.frame(d)
+d
+
+# drop columns
+e <- d[ -c(2:3,6:8,10:12,14) ] 
+e         
+
+# drop rows
+f <- e[-c(1:2,6), ]
+f
+row <- row.names(f)
+rows <- str_to_title(row)
+g <- cbind(rows,f$nbr.val, f$min, prettyNum((f$max),big.mark=",", scientific=FALSE), 
+    prettyNum((f$mean),big.mark=",", scientific=FALSE), prettyNum((f$std.dev),big.mark=",", scientific=FALSE))
+g
+
+# create table of summary statistics
+kable(g, col.names = c("Variable", "Obs", "Min","Max", "Mean", "Std Dev"), 
+      caption = "Summary Statistics") %>% 
+  kable_styling(bootstrap_options = "basic", full_width = F, position = "center")
+
+
+
+
+
+        
+         
+
