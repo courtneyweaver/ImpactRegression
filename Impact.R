@@ -36,6 +36,9 @@ data <-data[!(data$sales==0),]
 data <-data[!(data$sales<=5),]
 data <- data[!is.na(data$sales),]
 
+# drop client with $11B in sales... seems wrong
+data <- data[!(data$ID =="10062069"),]
+
 # number of clients
 count <- data %>%
   summarise(n_distinct(ID))
@@ -53,12 +56,15 @@ panel <- plm(lnSales ~ hours + employees + hoursSq, data=data, index=c("ID", "ye
 summary(panel)
 
 # print summary 
-stargazer(panel, type="html",
+stargazer(panel, type="text",
           dep.var.labels=c("Sales"),
           out="models.txt")
 
 # print summary statistics
 stargazer(as.data.frame(data[c("hours","employees","sales")]), type="text",
           summary.stat= c("n","mean", "sd", "min","max"), out = "SS.txt", digits = 2)
+
+  
+  
 
 
