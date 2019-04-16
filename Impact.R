@@ -52,7 +52,7 @@ hoursSq <- (data$hours)^2
 data$lnSales <- log(data$sales)
 
 # run panel regression 
-panel <- plm(lnSales ~ hours + employees + hoursSq, data=data, index=c("ID", "year"), model="within")
+panel <- plm(lnSales ~ hours + employees + hoursSq, data=data, index=c("ID", "year"), model="within", effect="twoways")
 summary(panel)
 
 # print summary 
